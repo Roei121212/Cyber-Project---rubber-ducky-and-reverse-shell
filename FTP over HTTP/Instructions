@@ -1,0 +1,14 @@
+# Instructions
+
+1. compile the reverse shell victim file. you might use PyInstaller and the following commend:
+   *make sure to navigate to the appropriate directory before and the processed to install
+   python -m PyInstaller --onefile {your file name}.py
+
+2. copy and paste main.exe file to the "FTP over HTTP" directory
+
+3. change the IP in constants file to your pc ip
+4. change the port to whatever i recommend using port 20001 and higher
+5. make sure its the same server:port you put in payload.dd on the rubber ducky
+6. now run the server and you should be good to go :)
+
+

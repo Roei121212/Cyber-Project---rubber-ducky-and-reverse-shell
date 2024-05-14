@@ -1,0 +1,12 @@
+# instructions
+
+1. connect pi pico to pc
+2. drag from "delete and boot" folder the file named "adafruit-circuitpython-raspberry_pi_pico_w-en_US-8.2.9 (3).uf2"
+   to pi pico folder
+3. copy the rest of the files and folders do not include instruction and delete and boot to the pi pico folder
+4. change the "payload.dd" file to your liking check link for more help https://docs.hak5.org/hak5-usb-rubber-ducky
+5. in case tou want to change something drag from "delete and boot" folder the file named "flash_nuke.uf2" and repeat
+  steps 1 - 4
+
+
+**make sure its the same server:port you put in ftp over http server

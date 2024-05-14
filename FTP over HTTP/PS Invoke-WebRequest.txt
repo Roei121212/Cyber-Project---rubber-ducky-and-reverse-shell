@@ -1,0 +1,1 @@
+Invoke-WebRequest -URI "127.0.0.1:8000/file" -OutFile "C:\Windows\file.exe"
