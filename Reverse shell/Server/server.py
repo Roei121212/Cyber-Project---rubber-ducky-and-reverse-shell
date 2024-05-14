@@ -7,7 +7,6 @@ import tcp_shell_server
 import tkinter as tk
 import network_utils
 
-
 clients = []
 
 LOCAL_IP = network_utils.find_local_ipv4addr()

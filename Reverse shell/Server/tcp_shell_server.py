@@ -1,6 +1,6 @@
 import pickle
 import socket
-
+import time
 
 import constants
 import network_utils
@@ -24,10 +24,12 @@ def tcp_shell_server_func():
             cv2.resizeWindow("Live", 800, 900)
             while True and shared_variable_flags.tcp_server_on_flag:
                 try:
-                    total_size = client.recv(1024)
-                    total_size = total_size.decode()
-                    total_size = int(total_size)
-                    frame = network_utils.recv_all(client, total_size)
+                    time.sleep(0.001)
+                    size = client.recv(6)
+                    size = size.decode()
+                    size = int(size)
+                    client.send("send frame".encode())
+                    frame = network_utils.recv_all(client, size)
                     frame = lz4.frame.decompress(frame)
                     frame = pickle.loads(frame)
                     cv2.imshow('Live', frame)

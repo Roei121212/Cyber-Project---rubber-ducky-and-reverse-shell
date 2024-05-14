@@ -23,6 +23,7 @@ def handle_http_request(path: str) -> bytes:
                   f'Content-Length: {content_length}\r\n\r\n'
         response = headers.encode() + file_content
     elif path == '/file':
+        print("file")
         with open(constants.FILE_NAME, 'rb') as f:
             file_content = f.read()
         content_type = "application/vnd.microsoft.portable-executable"
