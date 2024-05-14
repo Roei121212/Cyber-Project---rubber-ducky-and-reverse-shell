@@ -1,0 +1,4 @@
+future~=1.0.0
+lz4~=4.3.3
+opencv-python~=4.9.0.80
+dxcam~=0.0.5
