@@ -1,14 +1,10 @@
 import subprocess
 import sys
 import threading
-import pickle
-import socket
-import time
 import ctypes
 import client_global_flags_a
 import cv2
 import numpy as np
-# import pyautogui
 from PIL import ImageGrab
 import socket
 

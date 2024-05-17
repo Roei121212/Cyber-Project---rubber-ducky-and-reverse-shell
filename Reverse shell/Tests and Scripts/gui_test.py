@@ -49,7 +49,7 @@ def tcp_shell_server_flask(ip: str, port: int):
 
     @app.route('/')
     def index():
-        return render_template('index.html')
+        return render_template('index.html.html')
 
     @app.route('/screen')
     def screen():

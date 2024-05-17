@@ -143,4 +143,3 @@ run_threads()
 auto_update()
 
 root.mainloop()
-print("ass")
