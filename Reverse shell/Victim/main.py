@@ -6,54 +6,37 @@ import socket
 import time
 import ctypes
 import client_global_flags_a
-import dxcam
-import lz4.frame
+import cv2
+import numpy as np
+# import pyautogui
+from PIL import ImageGrab
+import socket
 
-global camera
-global s
 
-
-def init_stream(host, port):
-    global camera
-    global s
-    host = host
-    port = port
-    print(host, type(host))
-    print(port, type(port))
+def stream_to_server(ip, port):
+    if not client_global_flags_a.streaming:
+        return
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
+    s.connect((ip, port))
 
-    target_fps = 24
-    camera = dxcam.create(output_idx=0, output_color="BGR")
-
-
-def start_stream(camera_cam, s_socket):
-    print("s")
     while True:
-        if client_global_flags_a.streaming:
-            try:
-                frame = camera_cam.grab()
-                frame = pickle.dumps(frame)
-                frame = lz4.frame.compress(frame)
 
-                size = len(frame)
-                size = str(size)
-                size = size.encode(encoding='utf8')
-                s_socket.send(size)
-                ready = s.recv(10).decode()
-                s_socket.sendall(frame)
-            except Exception as e:
-                pass
-
-
-'''if sys.argv[-1] != 'hidden':
-    subprocess.Popen([sys.executable] + sys.argv + ['hidden'],
-                     creationflags=subprocess.CREATE_NO_WINDOW)
+        screen = ImageGrab.grab()
+        frame = np.array(screen)
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        # Encode the frame as JPEG with compression
+        encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 50]
+        ret, buffer = cv2.imencode('.jpg', frame, encode_param)
+        frame = buffer.tobytes()
+        if not client_global_flags_a.streaming:
+            return
+        # Send the length of the frame
+        s.sendall(len(frame).to_bytes(6, byteorder='big'))
+        # Send the frame data
+        s.sendall(frame)
 
 
-else:'''
-
-SW_HIDE = 0
+'''SW_HIDE = 0
 
 
 def hide_console():
@@ -61,11 +44,12 @@ def hide_console():
 
 
 hide_console()
-time.sleep(15)
+time.sleep(15)'''
 
 my_socket = socket.socket()
-my_socket.connect(("10.0.0.10", 44100))
+my_socket.connect(("10.0.0.12", 44100))
 while True:
+    print("waiting")
     msg = my_socket.recv(1024).decode()
     print(msg)
     if msg == "UP":
@@ -76,12 +60,12 @@ while True:
         # print(ip_port)
         ip = ip_port[:ip_port.index(":")]
         port = int(ip_port[ip_port.index(":") + 1:])
-        init_stream(ip, port)
-        t = threading.Thread(target=start_stream, args=(camera, s,))
-        t.start()
         client_global_flags_a.streaming = True
+        t = threading.Thread(target=stream_to_server, args=(ip, port))
+
+        t.start()
+
         # else:
         # client_global_flags.streaming = True
     if msg == "END_STREAM":
         client_global_flags_a.streaming = False
-        camera.stop()

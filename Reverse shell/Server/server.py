@@ -103,14 +103,14 @@ def close_popup():
 
 
 def connect():
+    shared_variable_flags.tcp_server_on_flag = True
     global saved_client
     saved_client.send("START_STREAM".encode())
     saved_client.send(
         f"{str(network_utils.find_local_ipv4addr())}:{str(constants.TCP_SHELL_SERVER_PORT)}".encode())
-    shared_variable_flags.tcp_server_on_flag = True
-    if saved_client and shared_variable_flags.tcp_server_on_flag:
-        t4 = threading.Thread(target=tcp_shell_server.tcp_shell_server_func)
-        t4.start()
+
+    t4 = threading.Thread(target=tcp_shell_server.run_shell_server)
+    t4.start()
 
 
 def disconnect():
@@ -143,3 +143,4 @@ run_threads()
 auto_update()
 
 root.mainloop()
+print("ass")

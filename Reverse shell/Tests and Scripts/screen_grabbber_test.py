@@ -2,7 +2,7 @@
 import dxcam
 
 # module 2 https://github.com/ponty/pyscreenshot
-import pyscreenshot
+# import pyscreenshot
 '''this module was so slow i completely gave up on it'''
 
 # module 3 https://github.com/asweigart/pyautogui

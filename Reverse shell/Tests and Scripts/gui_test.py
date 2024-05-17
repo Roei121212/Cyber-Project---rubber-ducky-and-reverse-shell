@@ -1,82 +1,68 @@
-import tkinter as tk
+from flask import Flask, render_template, Response
+import socket
+import constants
+import shared_variable_flags
+def recv_all(sock, size):
+    data = b""
+    while len(data) < size:
+        chunk = sock.recv(min(size - len(data), 4096))
+        if not chunk:
+            break
+        data += chunk
+    return data
 
 
-# Function to handle listbox item selection
-def on_select(event):
-    selected_item = listbox.get(listbox.curselection())
-    print("Selected item:", selected_item)
+def tcp_shell_server_flask(ip: str, port: int):
+    if shared_variable_flags.tcp_server_on_flag == False:
+        return None
+    app = Flask(__name__)
+    server_socket = socket.socket()
+    server_socket.bind((ip, port))
+    server_socket.listen()
+    client, address = server_socket.accept()
+
+    def generate_frames():
+        while True:
+            # capture the screen
+            # screen = ImageGrab.grab()
+
+            # frame = np.array(screen)
+
+            # convert the frame to RGB format
+            # frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+            # encode the frame as JPEG
+            # ret, buffer = cv2.imencode('.jpg', frame)
+            # frame = buffer.tobytes()
+            # print(frame)
+
+            try:
+                size = int.from_bytes(client.recv(6), byteorder='big')
+
+                size = int(size)
+                frame = recv_all(client, size)
+
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            except Exception as e:
+                print(e)
+
+    @app.route('/')
+    def index():
+        return render_template('index.html')
+
+    @app.route('/screen')
+    def screen():
+        return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+    return app
 
 
-# Function to add item to the list
-def add_item():
-    new_item = entry.get()
-    if new_item.strip():  # Check if the entry is not empty
-        my_list.append(new_item)  # Add the item to the underlying list
-        update_listbox()  # Update the listbox with the latest items
-        entry.delete(0, tk.END)  # Clear the entry after adding the item
+def run_shell_server():
+    app = tcp_shell_server_flask(constants.IP, constants.TCP_SHELL_SERVER_PORT)
+    if app is None:
+        return
+    app.run()
 
 
-# Function to delete selected item from the list
-def delete_item():
-    try:
-        selected_index = listbox.curselection()[0]
-        deleted_item = listbox.get(selected_index)
-        my_list.remove(deleted_item)  # Remove the item from the underlying list
-        update_listbox()  # Update the listbox with the latest items
-    except IndexError:  # Catch error if no item is selected
-        pass
-
-
-# Function to update listbox with the latest items
-def update_listbox():
-    listbox.delete(0, tk.END)  # Clear the existing items in the listbox
-    for item in my_list:
-        listbox.insert(tk.END, item)  # Insert each item from the updated list
-
-
-# Function to print the selected item and return it from the list
-def print_and_return_item():
-    try:
-        selected_index = listbox.curselection()[0]
-        selected_item = listbox.get(selected_index)
-        print("Selected item:", selected_item)
-        return selected_item
-    except IndexError:  # Catch error if no item is selected
-        return None  # Return None when no item is selected
-
-
-# Create main window
-root = tk.Tk()
-root.title("List Operations")
-
-# Initial list
-my_list = ["Apple", "Banana", "Orange"]
-
-# Create a listbox to display the list
-listbox = tk.Listbox(root, font=("Arial", 12), selectmode=tk.SINGLE)
-listbox.pack(pady=10, padx=10, expand=True, fill=tk.BOTH)
-
-# Populate the listbox with initial items
-update_listbox()
-
-# Bind the listbox item selection event
-listbox.bind("<<ListboxSelect>>", on_select)
-
-# Entry widget to enter new items
-entry = tk.Entry(root, font=("Arial", 12))
-entry.pack(pady=5, padx=10, fill=tk.BOTH)
-
-# Button to add new item
-add_button = tk.Button(root, text="Add Item", command=add_item)
-add_button.pack(pady=5, padx=10, fill=tk.BOTH)
-
-# Button to delete selected item
-delete_button = tk.Button(root, text="Delete Item", command=delete_item)
-delete_button.pack(pady=5, padx=10, fill=tk.BOTH)
-
-# Button to print selected item and return it from the list
-print_return_button = tk.Button(root, text="Print and Return Item", command=print_and_return_item)
-print_return_button.pack(pady=5, padx=10, fill=tk.BOTH)
-
-# Run the Tkinter event loop
-root.mainloop()
+run_shell_server()
