@@ -16,11 +16,15 @@ def recv_all(sock, size):
 
 def tcp_shell_server_flask(ip: str, port: int):
     app = Flask(__name__)
-    server_socket = socket.socket()
-    server_socket.bind((ip, port))
-    server_socket.listen()
+    try:
+        server_socket = socket.socket()
+        server_socket.bind((ip, port))
+        server_socket.listen()
+    except OSError:
+        pass
 
     def generate_frames():
+        print(server_socket)
         client, address = server_socket.accept()
         while shared_variable_flags.tcp_server_on_flag:
             try:
@@ -32,8 +36,9 @@ def tcp_shell_server_flask(ip: str, port: int):
                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             except Exception as e:
                 print(e)
-                break
         client.close()
+
+
 
     @app.route('/')
     def index():
